@@ -132,6 +132,9 @@
               "devServerTarget": "fuse:serve:production"
             }
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }

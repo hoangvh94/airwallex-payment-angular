@@ -9,15 +9,9 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FuseCardComponent } from '@fuse/components/card';
-import { StripeElementsOptions } from '@stripe/stripe-js';
 import Airwallex from 'airwallex-payment-elements';
 import { AirwallexService } from 'app/core/airwallex/airwallex.service';
-import {
-    StripeElementsDirective,
-    StripePaymentElementComponent,
-    injectStripe,
-} from 'ngx-stripe';
-
+import { StripeElementsDirective } from 'ngx-stripe';
 
 @Component({
     selector: 'pricing-checkout',
@@ -25,13 +19,7 @@ import {
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [
-        MatButtonModule,
-        FuseCardComponent,
-        MatIconModule,
-        StripeElementsDirective,
-        StripePaymentElementComponent,
-    ],
+    imports: [MatButtonModule, FuseCardComponent, MatIconModule],
 })
 export class PricingCheckoutComponent implements OnInit {
     @ViewChild(StripeElementsDirective) elements!: StripeElementsDirective;
@@ -40,6 +28,8 @@ export class PricingCheckoutComponent implements OnInit {
         expires_at: '2024-11-20T03:38:36+0000',
         token: 'eyJhbGciOiJIUzI1NiJ9',
     };
+
+    airCustomer: any;
 
     // stripe = injectStripe(
     //     'pk_test_51MziZKDnfhTxQmx98ded7vhy40ATWeQVFNL7F7nVFIlbsbBL4mLOaSyVxKSOTBmcnMJWVo6CnxLTZQxr1pxWcMSj00tgxXYVjU'
@@ -60,11 +50,67 @@ export class PricingCheckoutComponent implements OnInit {
         });
     }
 
+    createCustomer(airwallexAuth: any) {
+        this.airwallexService.createCustomer(airwallexAuth).subscribe(
+            (next) => {
+                console.log(next);
+                const customer = next;
+                this.dropIn(customer);
+            },
+            (error) => {
+                console.log(error);
+                // // Re-enable the form
+                // this.signInForm.enable();
+
+                // // Reset the form
+                // this.signInNgForm.resetForm();
+
+                // // Set the alert
+                // this.alert = {
+                //     type: 'error',
+                //     message: 'Wrong email or password',
+                // };
+
+                // // Show the alert
+                // this.showAlert = true;
+            }
+        );
+    }
+
     airAuthen() {
         this.airwallexService.authen().subscribe(
             (next) => {
                 console.log(next);
                 this.airwallexAuth = next;
+                // this.getCustomers(next);
+                this.createCustomer(next);
+            },
+            (error) => {
+                console.log(error);
+                // // Re-enable the form
+                // this.signInForm.enable();
+
+                // // Reset the form
+                // this.signInNgForm.resetForm();
+
+                // // Set the alert
+                // this.alert = {
+                //     type: 'error',
+                //     message: 'Wrong email or password',
+                // };
+
+                // // Show the alert
+                // this.showAlert = true;
+            }
+        );
+    }
+
+    getCustomers(airwallexAuth: any) {
+        this.airwallexService.getCustomer(airwallexAuth).subscribe(
+            (next) => {
+                console.log(next);
+                const customer = next;
+                console.log(customer);
             },
             (error) => {
                 console.log(error);
@@ -88,17 +134,16 @@ export class PricingCheckoutComponent implements OnInit {
 
     payByCard() {
         this.airAuthen();
-        this.dropIn();
     }
 
-    dropIn(){
+    dropIn(customer: any) {
         console.log('pay by drop');
         // const cardElement = Airwallex.createElement('card');
         // cardElement.mount('card');
         const element = Airwallex.createElement('dropIn', {
             intent_id: 'int_hkdm6zv7th2014emgx3',
-            customer_id: 'cus_hkdmp7xz9h20aemg93y',
-            client_secret: 'eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzIxODQxMzUsImV4cCI6MTczMjE4NzczNSwidHlwZSI6ImNsaWVudC1zZWNyZXQiLCJwYWRjIjoiSEsiLCJhY2NvdW50X2lkIjoiMzM1Y2ZlYjUtYjZkMy00MjQzLWIwZmEtMWY2N2I1MjY2YmJmIiwiY3VzdG9tZXJfaWQiOiJjdXNfaGtkbXA3eHo5aDIwYWVtZzkzeSJ9.0S-kM7PghPVp_ZptUElMLNWXziLu-WfsFkmAaLQqiso',
+            customer_id: customer.id,
+            client_secret: customer.client_secret,
             currency: 'SGD',
             mode: 'recurring',
             recurringOptions: {
@@ -126,23 +171,23 @@ export class PricingCheckoutComponent implements OnInit {
          */
         // this.loading = false;
         console.log(`Element is mounted: ${JSON.stringify(event.detail)}`);
-      }
+    }
 
-      // STEP #7: Add an event listener to handle events when the payment is successful.
-      onSuccess(event: any): void {
+    // STEP #7: Add an event listener to handle events when the payment is successful.
+    onSuccess(event: any): void {
         /**
          * ... Handle events on success
          */
         console.log(`Confirm success with ${JSON.stringify(event.detail)}`);
-      }
+    }
 
-      // STEP #8: Add an event listener to handle events when the payment has failed.
-      onError(event: any) {
+    // STEP #8: Add an event listener to handle events when the payment has failed.
+    onError(event: any) {
         /**
          * ... Handle events on error
          */
         const { error } = event.detail;
         // this.errorMessage = error.message ?? JSON.stringify(error); // Example: set error message
         console.error('There was an error', error);
-      }
+    }
 }
