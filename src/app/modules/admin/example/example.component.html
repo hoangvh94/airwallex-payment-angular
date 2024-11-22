@@ -4,6 +4,41 @@
         <!-- CONTENT GOES HERE -->
         <div
             class="h-400 max-h-400 min-h-400 rounded-2xl border-2 border-dashed border-gray-300"
-        ></div>
+        >
+            <div id="overview" [innerHTML]="overviewData"></div>
+            <form
+                (ngSubmit)="ask()"
+                #chatbotNgForm="ngForm"
+                [formGroup]="chatbotForm"
+            >
+                <!-- Email field -->
+                <mat-form-field class="w-full">
+                    <mat-label>Question</mat-label>
+                    <input id="query" matInput [formControlName]="'query'" />
+                    <button type="submit">send</button>
+                </mat-form-field>
+            </form>
+            <div id="answer" [innerHTML]="answer"></div>
+
+            <div id="image">
+                @for (im of images; track trackByFn($index, im.slice(0,10))) {
+                    <img [src]="'data:image/png;base64, ' + im" alt="">
+                }
+         
+            </div>
+
+            <div id="suggestion">
+                @for (quest of suggestion; track trackByFn($index, quest)) {
+                    <button
+                        class="fuse-mat-button-large mt-6 w-full"
+                        mat-flat-button
+                        [color]="'secondary'"
+                        (click)="askBySugest(quest)"
+                    >
+                        {{ quest }}
+                    </button>
+                }
+            </div>
+        </div>
     </div>
 </div>

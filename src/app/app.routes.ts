@@ -10,7 +10,7 @@ import { LayoutComponent } from 'app/layout/layout.component';
 export const appRoutes: Route[] = [
 
     // Redirect empty path to '/example'
-    {path: '', pathMatch : 'full', redirectTo: 'example'},
+    {path: '', pathMatch : 'full', redirectTo: 'dashboards/analytics'},
 
     // Redirect signed-in user to the '/example'
     //
@@ -74,7 +74,37 @@ export const appRoutes: Route[] = [
             initialData: initialDataResolver
         },
         children: [
-            {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')},
+            // {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')},
+            // Dashboards
+            {path: 'dashboards', children: [
+                {path: 'analytics', loadChildren: () => import('app/modules/admin/dashboards/analytics/analytics.routes')},
+            ]},
+
+            // Apps
+            {path: 'apps', children: [
+                {path: 'ecommerce', loadChildren: () => import('app/modules/admin/apps/ecommerce/ecommerce.routes')},
+                {path: 'file-manager', loadChildren: () => import('app/modules/admin/apps/file-manager/file-manager.routes')},
+                {path: 'help-center', loadChildren: () => import('app/modules/admin/apps/help-center/help-center.routes')},
+                {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')},
+            ]},
+
+            // Pages
+            {path: 'pages', children: [
+
+                // Pricing
+                {path: 'pricing', children: [
+                    {path: 'modern', loadChildren: () => import('app/modules/admin/pages/pricing/modern/modern.routes')},
+                    {path: 'checkout', loadChildren: () => import('app/modules/admin/pages/pricing/checkout/checkout.routes')},
+                    {path: 'single', loadChildren: () => import('app/modules/admin/pages/pricing/single/single.routes')},
+                    {path: 'table', loadChildren: () => import('app/modules/admin/pages/pricing/table/table.routes')}
+                ]},
+
+                // Profile
+                {path: 'profile', loadChildren: () => import('app/modules/admin/pages/profile/profile.routes')},
+
+                // Settings
+                {path: 'settings', loadChildren: () => import('app/modules/admin/pages/settings/settings.routes')},
+            ]},
         ]
     }
 ];

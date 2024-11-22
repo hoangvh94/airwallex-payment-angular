@@ -1,0 +1,85 @@
+<div class="relative flex min-w-0 flex-auto flex-col overflow-hidden">
+    <!-- Header & Cards -->
+    <div
+        class="relative overflow-hidden px-6 pb-12 pt-8 sm:px-16 sm:pb-24 sm:pt-20"
+    >
+        <!-- Background -->
+        <!-- prettier-ignore -->
+        <svg class="-z-1 absolute inset-0"
+             viewBox="0 0 960 540" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+            <g class="opacity-40 text-gray-200 dark:text-gray-800" fill="none" stroke="currentColor" stroke-width="100">
+                <circle r="234" cx="196" cy="23"></circle>
+                <circle r="234" cx="790" cy="491"></circle>
+            </g>
+        </svg>
+        <!-- Header -->
+        <div class="flex flex-col items-center">
+            <h2 class="text-xl font-semibold">PRICING</h2>
+            <div
+                class="mt-1 text-center text-4xl font-extrabold leading-tight tracking-tight sm:text-7xl"
+            >
+                Take control of your productivity
+            </div>
+            <div
+                class="text-secondary mt-3 text-center tracking-tight sm:text-2xl"
+            >
+                <div class="">Start small and free, upgrade as you go.</div>
+                <div class="">Take control of everything.</div>
+            </div>
+        </div>
+        <!-- Card -->
+        <!-- <div class="mt-10 flex justify-center sm:mt-20">
+            <ngx-stripe-elements [stripe]="stripe" [elementsOptions]="elementsOptions">
+                <ngx-stripe-payment />
+              </ngx-stripe-elements>
+        </div> -->
+        <div class="mt-10 flex justify-center sm:mt-20">
+            <fuse-card class="flex max-w-sm flex-col lg:max-w-240 lg:flex-row">
+                <div class="p-6 sm:p-8 lg:p-10">
+                    <div id="dropIn"></div>
+                </div>
+                <!-- Price -->
+                <div
+                    class="flex flex-col items-center bg-gray-100 p-8 dark:bg-black dark:bg-opacity-10 lg:min-w-80 lg:px-10 lg:py-12"
+                >
+                    <div class="flex items-center whitespace-nowrap">
+                        <div class="text-8xl font-extrabold tracking-tight">
+                            $599
+                        </div>
+                        <div class="text-secondary ml-2 text-2xl font-semibold">
+                            USD
+                        </div>
+                    </div>
+                    <div class="text-secondary text-center font-medium">
+                        <div>No monthly subscription,</div>
+                        <div>you only pay once.</div>
+                    </div>
+                    <button
+                        class="mb-2 mt-8 w-full lg:mt-auto"
+                        mat-flat-button
+                        [color]="'primary'"
+                    >
+                        Get Started
+                    </button>
+                    <button
+                        class="mb-2 mt-8 w-full lg:mt-auto"
+                        mat-flat-button
+                        [color]="'primary'"
+                    >
+                        Get Started
+                    </button>
+                    <button
+                        class="mb-2 mt-8 w-full lg:mt-auto"
+                        mat-flat-button
+                        [color]="'primary'"
+                        (click)="payByCard()"
+                    >
+                        Credit Card
+                    </button>
+                    <div id="card"></div>
+                    <div id="submit">Submit</div>
+                </div>
+            </fuse-card>
+        </div>
+    </div>
+</div>

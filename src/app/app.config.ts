@@ -17,9 +17,11 @@ import { provideIcons } from 'app/core/icons/icons.provider';
 import { mockApiServices } from 'app/mock-api';
 import { firstValueFrom } from 'rxjs';
 import { TranslocoHttpLoader } from './core/transloco/transloco.http-loader';
+import { provideNgxStripe } from 'ngx-stripe';
 
 export const appConfig: ApplicationConfig = {
     providers: [
+        provideNgxStripe('pk_test_51MziZKDnfhTxQmx98ded7vhy40ATWeQVFNL7F7nVFIlbsbBL4mLOaSyVxKSOTBmcnMJWVo6CnxLTZQxr1pxWcMSj00tgxXYVjU'),
         provideAnimations(),
         provideHttpClient(),
         provideRouter(
