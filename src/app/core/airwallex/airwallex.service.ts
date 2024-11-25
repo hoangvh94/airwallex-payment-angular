@@ -1,12 +1,21 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '@env/environment';
+import HttpsProxyAgent from 'https-proxy-agent';
+
+
+const proxyConfig = [{
+    context: '/api',
+    target: 'https://api-demo.airwallex.com',
+    secure: false
+  }];
 
 @Injectable({ providedIn: 'root' })
 export class AirwallexService {
     private _httpClient = inject(HttpClient);
     private url = environment.baseUrl;
-    private apiUrl = environment.baseUrl + environment.apiUrl;
+    private apiUrl = environment.apiUrl;
+    // private baseUrl = environment.apiUrl;
     private airwallexUrl = environment.airwallex.apiUrl;
 
     buildHeader(airwallexAuth) {
@@ -19,15 +28,14 @@ export class AirwallexService {
     authen() {
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
-            'x-api-key': environment.airwallex.apiKey,
-            'x-client-id': environment.airwallex.clientId,
+            Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}`,
         });
-        console.log(headers);
-        const body = null;
-        return this._httpClient.post(
-            this.airwallexUrl + '/v1/authentication/login',
-            body,
-            { headers: headers }
+        // console.log(headers);
+        // const body = null;
+        return this._httpClient.get(
+            this.apiUrl + '/airwallex', {
+                headers: headers,
+            }
         );
     }
 

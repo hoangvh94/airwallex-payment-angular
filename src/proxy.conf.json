@@ -1,8 +1,10 @@
  {
   "/api": {
-    "target": "https://api-demo.airwallex.com",
+    "target": "https://api-demo.airwallex.com/",
     "secure": false,
     "changeOrigin": true,
-    "logLevel": "debug"
+    "pathRewrite": {
+      "^/api": ""
+    }
   }
 }

@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
@@ -58,6 +58,7 @@
     "angular-cli-ghpages": "^2.0.3",
     "autoprefixer": "10.4.19",
     "chroma-js": "2.4.2",
+    "https-proxy-agent": "^7.0.5",
     "jasmine": "5.4.0",
     "jasmine-core": "5.1.2",
     "karma": "6.4.3",

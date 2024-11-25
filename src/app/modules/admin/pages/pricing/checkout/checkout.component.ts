@@ -2,6 +2,7 @@
 import {
     ChangeDetectionStrategy,
     Component,
+    OnDestroy,
     OnInit,
     ViewChild,
     ViewEncapsulation,
@@ -21,7 +22,7 @@ import { StripeElementsDirective } from 'ngx-stripe';
     standalone: true,
     imports: [MatButtonModule, FuseCardComponent, MatIconModule],
 })
-export class PricingCheckoutComponent implements OnInit {
+export class PricingCheckoutComponent implements OnInit, OnDestroy {
     @ViewChild(StripeElementsDirective) elements!: StripeElementsDirective;
     yearlyBilling: boolean = true;
     airwallexAuth: any = {
@@ -44,46 +45,54 @@ export class PricingCheckoutComponent implements OnInit {
      * Constructor
      */
     constructor(private airwallexService: AirwallexService) {}
+
     ngOnInit(): void {
         Airwallex.loadAirwallex({
             env: 'demo', // 'staging' | 'demo' | 'prod'
         });
     }
 
-    createCustomer(airwallexAuth: any) {
-        this.airwallexService.createCustomer(airwallexAuth).subscribe(
-            (next) => {
-                console.log(next);
-                const customer = next;
-                this.dropIn(customer);
-            },
-            (error) => {
-                console.log(error);
-                // // Re-enable the form
-                // this.signInForm.enable();
+    // createCustomer(airwallexAuth: any) {
+    //     const customer = {
+    //         id: 'cus_hkdmht8f4h21bn9ex4w',
+    //         client_secret:"eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzIyNjUxOTgsImV4cCI6MTczMjI2ODc5OCwidHlwZSI6ImNsaWVudC1zZWNyZXQiLCJwYWRjIjoiSEsiLCJhY2NvdW50X2lkIjoiMzM1Y2ZlYjUtYjZkMy00MjQzLWIwZmEtMWY2N2I1MjY2YmJmIiwiY3VzdG9tZXJfaWQiOiJjdXNfaGtkbWh0OGY0aDIxYm45ZXg0dyJ9.EpSF6bC8FguLnYlmsg-OM9Gl_m3VsjJur5oozl77c6s"
+    //     };
+    //     this.dropIn(customer);
+    //     // this.airwallexService.createCustomer(airwallexAuth).subscribe(
+    //     //     (next) => {
+    //     //         console.log(next);
+    //     //         const customer = next;
+    //     //         this.dropIn(customer);
+    //     //     },
+    //     //     (error) => {
+    //     //         console.log(error);
+    //     //         // // Re-enable the form
+    //     //         // this.signInForm.enable();
 
-                // // Reset the form
-                // this.signInNgForm.resetForm();
+    //     //         // // Reset the form
+    //     //         // this.signInNgForm.resetForm();
 
-                // // Set the alert
-                // this.alert = {
-                //     type: 'error',
-                //     message: 'Wrong email or password',
-                // };
+    //     //         // // Set the alert
+    //     //         // this.alert = {
+    //     //         //     type: 'error',
+    //     //         //     message: 'Wrong email or password',
+    //     //         // };
 
-                // // Show the alert
-                // this.showAlert = true;
-            }
-        );
-    }
+    //     //         // // Show the alert
+    //     //         // this.showAlert = true;
+    //     // }
+    //     // );
+    // }
 
     airAuthen() {
         this.airwallexService.authen().subscribe(
-            (next) => {
+            (next: any) => {
                 console.log(next);
-                this.airwallexAuth = next;
+                const res = next.data[0];
+                this.dropIn(res.customerId, res.customerSecret, res.intentId);
+                // this.airwallexAuth = next;
                 // this.getCustomers(next);
-                this.createCustomer(next);
+                // this.createCustomer(next);
             },
             (error) => {
                 console.log(error);
@@ -105,64 +114,73 @@ export class PricingCheckoutComponent implements OnInit {
         );
     }
 
-    getCustomers(airwallexAuth: any) {
-        this.airwallexService.getCustomer(airwallexAuth).subscribe(
-            (next) => {
-                console.log(next);
-                const customer = next;
-                console.log(customer);
-            },
-            (error) => {
-                console.log(error);
-                // // Re-enable the form
-                // this.signInForm.enable();
+    // getCustomers(airwallexAuth: any) {
+    //     this.airwallexService.getCustomer(airwallexAuth).subscribe(
+    //         (next) => {
+    //             console.log(next);
+    //             const customer = next;
+    //             console.log(customer);
+    //         },
+    //         (error) => {
+    //             console.log(error);
+    //             // // Re-enable the form
+    //             // this.signInForm.enable();
 
-                // // Reset the form
-                // this.signInNgForm.resetForm();
+    //             // // Reset the form
+    //             // this.signInNgForm.resetForm();
 
-                // // Set the alert
-                // this.alert = {
-                //     type: 'error',
-                //     message: 'Wrong email or password',
-                // };
+    //             // // Set the alert
+    //             // this.alert = {
+    //             //     type: 'error',
+    //             //     message: 'Wrong email or password',
+    //             // };
 
-                // // Show the alert
-                // this.showAlert = true;
-            }
-        );
-    }
+    //             // // Show the alert
+    //             // this.showAlert = true;
+    //         }
+    //     );
+    // }
 
     payByCard() {
         this.airAuthen();
+
+        // this.dropIn(
+        //     "cus_hkdmht8f4h24lp5676q",
+        //     "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzI1MjIxNzIsImV4cCI6MTczMjUyNTc3MiwidHlwZSI6ImNsaWVudC1zZWNyZXQiLCJwYWRjIjoiSEsiLCJhY2NvdW50X2lkIjoiMzM1Y2ZlYjUtYjZkMy00MjQzLWIwZmEtMWY2N2I1MjY2YmJmIiwiY3VzdG9tZXJfaWQiOiJjdXNfaGtkbWh0OGY0aDI0bHA1Njc2cSJ9.GVDkzM8cnYKbxLSaz6oMUamOTQpylBNQ6uuzBndp66E",
+        //     "int_hkdmht8f4h24lp59ddw"
+        // );
     }
 
-    dropIn(customer: any) {
+    dropIn(customer_id: string, client_secret, intent_id: string) {
         console.log('pay by drop');
         // const cardElement = Airwallex.createElement('card');
         // cardElement.mount('card');
-        const element = Airwallex.createElement('dropIn', {
-            intent_id: 'int_hkdm6zv7th2014emgx3',
-            customer_id: customer.id,
-            client_secret: customer.client_secret,
-            currency: 'SGD',
-            mode: 'recurring',
-            recurringOptions: {
-                next_triggered_by: 'merchant',
-                merchant_trigger_reason: 'scheduled',
-                currency: 'SGD',
-            },
-            googlePayRequestOptions: {
-                countryCode: 'US',
-                merchantInfo: {
-                    merchantName: 'Example Merchant',
-                },
-                buttonType: 'buy', // Indicate the type of button you want displayed on your payments form. Like 'buy'
-            },
-        });
-        element.mount('dropIn');
-        window.addEventListener('onReady', this.onReady);
-        window.addEventListener('onSuccess', this.onSuccess);
-        window.addEventListener('onError', this.onError);
+        setTimeout(() => {
+            const element = Airwallex.createElement('dropIn', {
+                intent_id,
+                customer_id,
+                client_secret,
+                currency: 'USD',
+                methods: ['googlepay', 'applepay', 'card'],
+                // mode: 'recurring',
+                // recurringOptions: {
+                //     next_triggered_by: 'merchant',
+                //     merchant_trigger_reason: 'scheduled',
+                //     currency: 'SGD',
+                // },
+                // googlePayRequestOptions: {
+                //     countryCode: 'US',
+                //     merchantInfo: {
+                //         merchantName: 'Example Merchant',
+                //     },
+                //     buttonType: 'buy', // Indicate the type of button you want displayed on your payments form. Like 'buy'
+                // },
+            });
+            element.mount('dropIn');
+            window.addEventListener('onReady', this.onReady);
+            window.addEventListener('onSuccess', this.onSuccess);
+            window.addEventListener('onError', this.onError);
+        }, 0);
     }
 
     onReady(event: any): void {
@@ -189,5 +207,9 @@ export class PricingCheckoutComponent implements OnInit {
         const { error } = event.detail;
         // this.errorMessage = error.message ?? JSON.stringify(error); // Example: set error message
         console.error('There was an error', error);
+    }
+
+    ngOnDestroy(): void {
+        Airwallex.destroyElement('dropIn');
     }
 }

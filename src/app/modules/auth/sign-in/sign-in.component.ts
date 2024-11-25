@@ -68,10 +68,10 @@ export class AuthSignInComponent implements OnInit {
         // Create the form
         this.signInForm = this._formBuilder.group({
             email: [
-                'hughes.brian@company.com',
+                'admin@gmail.com',
                 [Validators.required, Validators.email],
             ],
-            password: ['admin', Validators.required],
+            password: ['admin@123456', Validators.required],
             rememberMe: [''],
         });
     }
@@ -105,7 +105,7 @@ export class AuthSignInComponent implements OnInit {
                 const redirectURL =
                     this._activatedRoute.snapshot.queryParamMap.get(
                         'redirectURL'
-                    ) || '/signed-in-redirect';
+                    ) || '/';
 
                 // Navigate to the redirect url
                 this._router.navigateByUrl(redirectURL);

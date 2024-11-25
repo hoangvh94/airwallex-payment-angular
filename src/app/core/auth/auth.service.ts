@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { environment } from '@env/environment';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
@@ -9,6 +10,8 @@ export class AuthService {
     private _authenticated: boolean = false;
     private _httpClient = inject(HttpClient);
     private _userService = inject(UserService);
+
+    private authenUrl = environment.authenUrl;
 
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
@@ -23,6 +26,22 @@ export class AuthService {
 
     get accessToken(): string {
         return localStorage.getItem('accessToken') ?? '';
+    }
+
+    set tokenExpire(expire: string) {
+        localStorage.setItem('tokenExpire', expire);
+    }
+
+    get tokenExpire(): string {
+        return localStorage.getItem('tokenExpire') ?? '';
+    }
+
+    set user(u: any) {
+        localStorage.setItem('user', u);
+    }
+
+    get user(): any {
+        return localStorage.getItem('user') ?? {};
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -58,16 +77,31 @@ export class AuthService {
             return throwError('User is already logged in.');
         }
 
-        return this._httpClient.post('api/auth/sign-in', credentials).pipe(
+        return this._httpClient.post(this.authenUrl + '/signin', credentials).pipe(
             switchMap((response: any) => {
+                console.log(response);
+                const auth = response.data[0];
                 // Store the access token in the local storage
-                this.accessToken = response.accessToken;
+                this.accessToken = auth.jwt;
 
                 // Set the authenticated flag to true
                 this._authenticated = true;
 
                 // Store the user on the user service
-                this._userService.user = response.user;
+                this._userService.user = {
+                    id: auth.userId,
+                    name: auth.userName,
+                    email: auth.email,
+                    avatar: 'images/avatars/brian-hughes.jpg',
+                    status: 'online',
+                };
+                this.user = JSON.stringify({
+                    id: auth.userId,
+                    name: auth.userName,
+                    email: auth.email,
+                    avatar: 'images/avatars/brian-hughes.jpg',
+                    status: 'online',
+                })
 
                 // Return a new observable with the response
                 return of(response);
@@ -79,38 +113,47 @@ export class AuthService {
      * Sign in using the access token
      */
     signInUsingToken(): Observable<any> {
+        let d = new Date();
+        let now = d.getMilliseconds();
+        if ((Number(this.tokenExpire) < now)) {
+            this._userService.user = JSON.parse(this.user);
+            return of(true);
+        }else {
+            return of(false);
+        }
         // Sign in using the token
-        return this._httpClient
-            .post('api/auth/sign-in-with-token', {
-                accessToken: this.accessToken,
-            })
-            .pipe(
-                catchError(() =>
-                    // Return false
-                    of(false)
-                ),
-                switchMap((response: any) => {
-                    // Replace the access token with the new one if it's available on
-                    // the response object.
-                    //
-                    // This is an added optional step for better security. Once you sign
-                    // in using the token, you should generate a new one on the server
-                    // side and attach it to the response object. Then the following
-                    // piece of code can replace the token with the refreshed one.
-                    if (response.accessToken) {
-                        this.accessToken = response.accessToken;
-                    }
+        // return this._httpClient
+        //     .post('api/auth/sign-in-with-token', {
+        //         accessToken: this.accessToken,
+        //     })
+        //     .pipe(
+        //         catchError(() =>
+        //             // Return false
+        //             of(false)
+        //         ),
+        //         switchMap((response: any) => {
+        //             // Replace the access token with the new one if it's available on
+        //             // the response object.
+        //             //
+        //             // This is an added optional step for better security. Once you sign
+        //             // in using the token, you should generate a new one on the server
+        //             // side and attach it to the response object. Then the following
+        //             // piece of code can replace the token with the refreshed one.
+        //             if (response.accessToken) {
+        //                 this.accessToken = response.accessToken;
+        //             }
 
-                    // Set the authenticated flag to true
-                    this._authenticated = true;
+        //             // Set the authenticated flag to true
+        //             this._authenticated = true;
 
-                    // Store the user on the user service
-                    this._userService.user = response.user;
+        //             // Store the user on the user service
+        //             this._userService.user = response.user;
 
-                    // Return true
-                    return of(true);
-                })
-            );
+        //             // Return true
+        //             return of(true);
+        //         })
+        //     );
+
     }
 
     /**
