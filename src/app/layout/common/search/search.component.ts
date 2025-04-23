@@ -1,6 +1,5 @@
 import { Overlay } from '@angular/cdk/overlay';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import {
     Component,
     ElementRef,
@@ -11,7 +10,6 @@ import {
     OnDestroy,
     OnInit,
     Output,
-    Renderer2,
     SimpleChanges,
     ViewChild,
     ViewEncapsulation,
@@ -29,12 +27,16 @@ import {
 } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule } from '@angular/material/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations/public-api';
-import { Subject, debounceTime, filter, map, takeUntil } from 'rxjs';
+import { FuseLoadingService } from '@fuse/services/loading';
+import { SearchService } from 'app/core/search/search.service';
+import { Subject, debounceTime, filter, finalize, map, takeUntil } from 'rxjs';
+import { ItemComponent } from './item/item.component';
 
 @Component({
     selector: 'search',
@@ -82,9 +84,9 @@ export class SearchComponent implements OnChanges, OnInit, OnDestroy {
      * Constructor
      */
     constructor(
-        private _elementRef: ElementRef,
-        private _httpClient: HttpClient,
-        private _renderer2: Renderer2
+        private searchService: SearchService,
+        private _matDialog: MatDialog,
+        private fuseLoadingService: FuseLoadingService
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -111,6 +113,8 @@ export class SearchComponent implements OnChanges, OnInit, OnDestroy {
     set barSearchInput(value: ElementRef) {
         // If the value exists, it means that the search input
         // is now in the DOM, and we can focus on the input..
+        console.log('vao day');
+
         if (value) {
             // Give Angular time to complete the change detection cycle
             setTimeout(() => {
@@ -144,6 +148,7 @@ export class SearchComponent implements OnChanges, OnInit, OnDestroy {
         if ('appearance' in changes) {
             // To prevent any issues, close the
             // search after changing the appearance
+
             this.close();
         }
     }
@@ -173,15 +178,49 @@ export class SearchComponent implements OnChanges, OnInit, OnDestroy {
                 filter((value) => value && value.length >= this.minLength)
             )
             .subscribe((value) => {
-                this._httpClient
-                    .post('api/common/search', { query: value })
-                    .subscribe((resultSets: any) => {
-                        // Store the result sets
-                        this.resultSets = resultSets;
+                // this._httpClient
+                //     .post('api/common/search', { query: value })
+                //     .subscribe((resultSets: any) => {
+                //         // Store the result sets
+                //         this.resultSets = resultSets;
+                //         console.log(resultSets);
 
-                        // Execute the event
-                        this.search.next(resultSets);
-                    });
+                //         // Execute the event
+                //         this.search.next(resultSets);
+                //     });
+                this.fuseLoadingService._setLoadingStatus(
+                    true,
+                    'search alogla'
+                );
+
+                this.searchService
+                    .search(value)
+                    .pipe(
+                        finalize(() => {
+                            // Set the status to false if there are any errors or the request is completed
+                            this.fuseLoadingService._setLoadingStatus(
+                                false,
+                                'search alogla'
+                            );
+                        })
+                    )
+                    .subscribe(
+                        (next: any) => {
+                            this.resultSets = [];
+                            if (next.results[0].hits.length > 0) {
+                                const results = [];
+                                results.push({
+                                    id: 'products',
+                                    label: 'Products',
+                                    results: next.results[0].hits,
+                                });
+                                this.resultSets = results;
+                            }
+                        },
+                        (error) => {
+                            console.log(error);
+                        }
+                    );
             });
     }
 
@@ -233,6 +272,7 @@ export class SearchComponent implements OnChanges, OnInit, OnDestroy {
      */
     close(): void {
         // Return if it's already closed
+
         if (!this.opened) {
             return;
         }
@@ -252,5 +292,20 @@ export class SearchComponent implements OnChanges, OnInit, OnDestroy {
      */
     trackByFn(index: number, item: any): any {
         return item.id || index;
+    }
+
+    /**
+     * Choose item
+     * * Used in 'bar'
+     */
+    choose(item: any) {
+        this.close();
+        this._matDialog.open(ItemComponent, {
+            autoFocus: false,
+            disableClose: true,
+            data: {
+                item,
+            },
+        });
     }
 }

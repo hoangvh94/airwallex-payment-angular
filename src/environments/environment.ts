@@ -10,12 +10,13 @@
 // bundle, and you should not use it for any sensitive information like passwords or keys.
 
 export const environment = {
-    quadrantUrl: 'http://192.168.13.128:8066/',
+    quadrantUrl: 'http://172.22.171.39:8066/',
     quadrantApiUrl: 'api/v1/',
-    baseUrl: 'http://localhost:8081/',
+    baseUrl: 'http://192.168.1.27:8081/',
     // apiUrl: 'api/v1/',
-    apiUrl: 'http://localhost:8081/api/v1',
-    authenUrl: 'http://localhost:8081/api/auth',
+    apiUrl: 'http://192.168.1.27:8081/api/v1',
+    authenUrl: 'http://192.168.1.27:8081/api/auth',
+    motorAiUrl: 'http://213.192.2.103:40133/api/v1',
   
     // authenUrl: 'http://192.168.1.27:8081/api/auth',
     // clientSecret: 'repairsAdvisorisgoingtothemoonanddropgoldtofoundersBAHthenIcanplaygameallday',

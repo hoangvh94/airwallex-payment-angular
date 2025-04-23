@@ -3,6 +3,11 @@
       "target": "https://api-demo.airwallex.com",
       "secure": false,
       "changeOrigin": true
+    },
+    "/*": {
+      "target": "https://dashboard.algolia.com",
+      "secure": false,
+      "changeOrigin": true
     }
   }
   

@@ -10,8 +10,8 @@ import { PDF } from './file.types';
 export class AiService {
     private _httpClient = inject(HttpClient);
     private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
-    private url = environment.baseUrl;
-    private apiUrl = environment.baseUrl + environment.apiUrl;
+    private url = environment.apiUrl;
+    private apiUrl = environment.quadrantUrl + environment.quadrantApiUrl;
 
     private STREAM_OPTION: any = {
         observe: 'events',
@@ -71,8 +71,13 @@ export class AiService {
         const formData: FormData = new FormData();
         formData.append('user_id', pdf.user_id);
         formData.append('product', pdf.product);
-        formData.append('file', pdf.file);
+        if (pdf.file) {
+            formData.append('file', pdf.file);
+        }
         formData.append('type', pdf.type.toString());
+        if (pdf.url) {
+            formData.append('url', pdf.url.toString());
+        }
 
         const req = new HttpRequest(
             'POST',
@@ -90,8 +95,10 @@ export class AiService {
     /**
      * get all file
      */
-    getAllFile() {
-        return this._httpClient.get<any>(this.apiUrl + 'get-uploaded-files/E2');
+    getAllFile(userId: string) {
+        return this._httpClient.get<any>(
+            this.apiUrl + 'get-uploaded-files/' + userId
+        );
     }
 
     /**
@@ -104,13 +111,16 @@ export class AiService {
         );
     }
 
-    getOverview(chatBot: ChatBot): Observable<any> {
+    getOverview(userId: string, collectionName: string): Observable<any> {
         // const headers = new HttpHeaders({
         //     // 'Content-Type': 'text/event-stream',
         // });
         return this._httpClient.post(
-            this.apiUrl + 'overview',
-            chatBot,
+            this.url + '/ai/overview',
+            {
+                userId,
+                collectionName,
+            },
             this.STREAM_OPTION
         );
     }
@@ -119,11 +129,19 @@ export class AiService {
         // const headers = new HttpHeaders({
         //     // 'Content-Type': 'text/event-stream',
         // });
+
         return this._httpClient.post(
             this.apiUrl + 'chatbot',
             chatBot,
             this.STREAM_OPTION
         );
+    }
+
+    getHistory(userId: string, historyId: string) {
+        return this._httpClient.post(this.apiUrl + 'history', {
+            user_id: userId,
+            history_id: historyId
+        });
     }
 
     getSuggestion(chatBot: ChatBot) {

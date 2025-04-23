@@ -67,13 +67,24 @@ export class AuthSignInComponent implements OnInit {
     ngOnInit(): void {
         // Create the form
         this.signInForm = this._formBuilder.group({
-            email: [
-                'admin@gmail.com',
-                [Validators.required, Validators.email],
-            ],
+            email: ['admin@gmail.com', [Validators.required, Validators.email]],
             password: ['admin@123456', Validators.required],
             rememberMe: [''],
         });
+        this.checkVerify();
+    }
+
+    checkVerify(){
+        const verifiedEmail = this._activatedRoute.snapshot.queryParamMap.get('verify');
+        if (verifiedEmail){
+            this.alert = {
+                type: 'info',
+                message: 'Email verified',
+            };
+            this.showAlert= true;
+            this.signInForm.controls.email.setValue(verifiedEmail);
+            this.signInForm.controls.password.setValue('');
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -127,5 +138,16 @@ export class AuthSignInComponent implements OnInit {
                 this.showAlert = true;
             }
         );
+    }
+
+    loginGoogle() {
+        this._authService.getGoogleUrl().subscribe({
+            next: (response) => {
+                window.location.href = response;
+            },
+            error: (error) => {
+                console.log(error);
+            },
+        });
     }
 }

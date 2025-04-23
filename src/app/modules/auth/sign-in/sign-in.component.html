@@ -147,11 +147,12 @@
 
                 <!-- Single sign-on buttons -->
                 <div class="mt-8 flex items-center space-x-4">
-                    <button class="flex-auto" type="button" mat-stroked-button>
-                        <mat-icon
+                    <button class="flex-auto" type="button" mat-stroked-button (click)="loginGoogle()">
+                        <!-- <mat-icon
                             class="icon-size-5"
-                            [svgIcon]="'feather:facebook'"
-                        ></mat-icon>
+                            [svgIcon]="'feather:google'"
+                        ></mat-icon> -->
+                        Google
                     </button>
                     <button class="flex-auto" type="button" mat-stroked-button>
                         <mat-icon

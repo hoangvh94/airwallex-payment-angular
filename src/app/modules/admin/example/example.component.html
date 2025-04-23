@@ -1,31 +1,36 @@
-<div class="flex min-w-0 flex-auto flex-col">
+<div class="flex min-w-0 flex-auto">
     <!-- Main -->
-    <div class="flex-auto p-6 sm:p-10">
+    <div class="w-6/12 flex-auto p-6 sm:p-10">
         <!-- CONTENT GOES HERE -->
-        <div
-            class="h-400 max-h-400 min-h-400 rounded-2xl border-2 border-dashed border-gray-300"
-        >
+        <div class="rounded-2xl border-2 border-dashed border-gray-300">
             <div id="overview" [innerHTML]="overviewData"></div>
-            <form
-                (ngSubmit)="ask()"
-                #chatbotNgForm="ngForm"
-                [formGroup]="chatbotForm"
-            >
-                <!-- Email field -->
-                <mat-form-field class="w-full">
-                    <mat-label>Question</mat-label>
-                    <input id="query" matInput [formControlName]="'query'" />
-                    <button type="submit">send</button>
-                </mat-form-field>
-            </form>
-            <div id="answer" [innerHTML]="answer"></div>
 
-            <div id="image">
-                @for (im of images; track trackByFn($index, im.slice(0,10))) {
-                    <img [src]="'data:image/png;base64, ' + im" alt="">
+            <div id="finalAnswer">
+                @for (answer of finalAnswer; track trackByFn($index, answer)) {
+                    <div class="answer" [innerHTML]="answer.text"></div>
+                    <div class="reference">
+                        <p>** Referrence doc:</p>
+                        @for (
+                            page of answer.pages;
+                            track trackByFn($index, page)
+                        ) {
+                            <span class="mr-3"
+                                >Referrence:
+                                <a
+                                    href="javascript:void(0)"
+                                    (click)="showReference(page)"
+                                    class="mr-3 font-medium text-blue-600 hover:underline dark:text-blue-500"
+                                    >{{ $index }}</a
+                                >
+                            </span>
+                        }
+                    </div>
                 }
-         
             </div>
+            <!-- <div id="finalAnswer"> {{finalAnswer}}</div> -->
+            <!-- <div id="finalShow" [innerHTML]="finalShow"></div> -->
+
+            <div id="answer" [innerHTML]="answer"></div>
 
             <div id="suggestion">
                 @for (quest of suggestion; track trackByFn($index, quest)) {
@@ -37,6 +42,50 @@
                     >
                         {{ quest }}
                     </button>
+                }
+            </div>
+            <form
+                (ngSubmit)="ask()"
+                #chatbotNgForm="ngForm"
+                [formGroup]="chatbotForm"
+            >
+                <!-- Email field -->
+                <mat-form-field class="mt-3 w-full">
+                    <mat-label>Question</mat-label>
+                    <input id="query" matInput [formControlName]="'query'" />
+                    <button type="submit">send</button>
+                </mat-form-field>
+            </form>
+        </div>
+    </div>
+
+    <div
+        class="sticky top-0 w-6/12 flex-auto self-start p-6 sm:p-10"
+        [ngClass]="{ hidden: !isShowReference }"
+    >
+        <!-- CONTENT GOES HERE -->
+        <div
+            class="relative rounded-2xl border-2 border-dashed border-gray-300"
+        >
+            <!-- <button
+                mat-flat-button
+                [color]="'primary'"
+                (click)="isShowReference = false"
+            >
+                <mat-icon [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+            </button> -->
+
+            <button
+                mat-icon-button
+                aria-label="exit show reference"
+                (click)="isShowReference = false"
+                class="absolute right-0"
+            >
+                <mat-icon>clear</mat-icon>
+            </button>
+            <div id="image">
+                @for (im of images; track trackByFn($index, im.slice(0, 10))) {
+                    <img [src]="'data:image/png;base64, ' + im" alt="" />
                 }
             </div>
         </div>

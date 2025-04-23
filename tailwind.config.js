@@ -283,6 +283,7 @@ const config = {
     },
     plugins: [
         // Fuse - Tailwind plugins
+        require('@tailwindcss/typography'),
         require(
             path.resolve(__dirname, 'src/@fuse/tailwind/plugins/utilities')
         ),

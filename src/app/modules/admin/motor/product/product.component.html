@@ -1,0 +1,72 @@
+<div class="flex flex-col mt-6 bg-white p-6 border rounded-md shadow-md w-full relative">
+  <!-- Flex container for chatBox and reference -->
+  <div class="message bg-gray-100 p-4 rounded-md">
+    You entered id: <strong>{{ id }}</strong>
+  </div>
+  <div class="flex flex-col sm:flex-row w-full gap-4 mb-4">
+    <!-- Chat Box -->
+
+    <div #chatBox class="chat-box overflow-y-auto p-2 bg-gray-50 rounded-md"
+      [ngClass]="showReference ? 'w-full sm:w-1/2' : 'w-full'">
+      <div *ngIf="messages.length > 0" class="flex justify-end mb-2">
+        <button (click)="printSection('chatBox')" class="text-gray-600 hover:text-gray-900">
+          🖨️ Print
+        </button>
+      </div>
+      <div id="chatBox">
+        <div *ngFor="let message of messages" class="message p-4 rounded-md"
+          [ngClass]="message.type === 'user' ? 'bg-blue-100' : 'bg-green-100'">
+
+          <div *ngIf="message.type !== 'user'" class="prose max-w-none">
+            <p><b>Jayda Answer:</b></p>
+            <markdown [data]="message.text" [sanitize]="false" [disableSanitizer]="true"></markdown>
+          </div>
+
+          <div *ngIf="message.type === 'user'">
+            <p><b>Your question:</b></p>
+            {{ message.text }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Reference Section -->
+
+    <div class="reference overflow-y-auto p-2 bg-orange-50 rounded-md" [ngClass]="{
+      'w-full sm:w-1/2': showReference && !isMobileScreen(), 
+      'hidden': !showReference, 
+      'absolute is-mobile inset-0 z-50 p-4 bg-orange-50': showReference && isMobileScreen()
+    }">
+      <!-- Toggle Button -->
+      <div class="toggle-reference flex justify-end mb-2 absolute bg-blue-100">
+        <button (click)="toggleReference()" class="text-gray-600 hover:text-gray-900">
+          <svg *ngIf="!showReference" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg *ngIf="showReference" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="flex justify-end mb-2">
+        <button (click)="printSection('reference')" class="text-gray-600 hover:text-gray-900">
+          🖨️ Print
+        </button>
+      </div>
+
+      <div #reference id="reference" class="reference-box"></div>
+    </div>
+  </div>
+
+  <!-- Chat Input -->
+  <form [formGroup]="chatForm" (ngSubmit)="sendMessage()" class="flex mt-auto">
+    <input formControlName="message" type="text" placeholder="Type your message..."
+      class="w-full px-4 py-2 border border-gray-300 rounded-md mr-2" />
+    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+      Send
+    </button>
+  </form>
+  <div id="custom-tooltip" style="display: none; position: fixed;"></div>
+
+</div>

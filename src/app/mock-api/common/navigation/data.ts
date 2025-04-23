@@ -95,6 +95,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon: 'heroicons_outline:chart-pie',
                 link: '/apps/example',
             },
+            {
+                id: 'motor',
+                title: 'Motor AI',
+                type: 'basic',
+                icon: 'heroicons_outline:chart-pie',
+                link: '/apps/motor',
+            },
         ],
     },
     {
@@ -107,41 +114,9 @@ export const defaultNavigation: FuseNavigationItem[] = [
             {
                 id: 'pages.pricing',
                 title: 'Pricing',
-                type: 'collapsable',
-                icon: 'heroicons_outline:banknotes',
-                children: [
-                    {
-                        id: 'pages.pricing.modern',
-                        title: 'Modern',
-                        type: 'basic',
-                        link: '/pages/pricing/modern',
-                    },
-                    {
-                        id: 'pages.pricing.checkout',
-                        title: 'Checkout',
-                        type: 'basic',
-                        link: '/pages/pricing/checkout',
-                    },
-                    {
-                        id: 'pages.pricing.single',
-                        title: 'Single',
-                        type: 'basic',
-                        link: '/pages/pricing/single',
-                    },
-                    {
-                        id: 'pages.pricing.table',
-                        title: 'Table',
-                        type: 'basic',
-                        link: '/pages/pricing/table',
-                    },
-                ],
-            },
-            {
-                id: 'pages.profile',
-                title: 'Profile',
                 type: 'basic',
-                icon: 'heroicons_outline:user-circle',
-                link: '/pages/profile',
+                icon: 'heroicons_outline:banknotes',
+                link: '/pages/pricing',
             },
             {
                 id: 'pages.settings',

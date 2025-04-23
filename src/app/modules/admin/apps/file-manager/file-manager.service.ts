@@ -1,5 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@env/environment';
 import {
     Item,
     Items,
@@ -20,6 +21,7 @@ export class FileManagerService {
     // Private
     private _item: BehaviorSubject<Item | null> = new BehaviorSubject(null);
     private _items: BehaviorSubject<Items | null> = new BehaviorSubject(null);
+    private apiUrl = environment.apiUrl;
 
     /**
      * Constructor
@@ -52,6 +54,7 @@ export class FileManagerService {
      * Get items
      */
     getItems(folderId: string | null = null): Observable<Item[]> {
+
         return this._httpClient
             .get<Items>('api/apps/file-manager', { params: { folderId } })
             .pipe(
@@ -60,19 +63,29 @@ export class FileManagerService {
                 })
             );
     }
+    // getItems(sku: string | null = null): Observable<Item[]> {
+    //     console.log(sku);
+
+    //     return this._httpClient
+    //         .get<Items>('api/apps/file-manager', { params: { sku } })
+    //         .pipe(
+    //             tap((response: any) => {
+    //                 this._items.next(response);
+    //             })
+    //         );
+    // }
 
     /**
      * Get item by id
      */
     getItemById(id: string): Observable<Item> {
-        return this._items.pipe(
-            take(1),
-            map((items) => {
+        return  this.getProductBySku(id).pipe(
+            map((res: any) => {
                 // Find within the folders and files
-                const item =
-                    [...items.folders, ...items.files].find(
-                        (value) => value.id === id
-                    ) || null;
+                const item = res.data[0];
+                console.log(item);
+                
+                // item.collection_name = "fake colectionnae";
 
                 // Update the item
                 this._item.next(item);
@@ -90,6 +103,19 @@ export class FileManagerService {
                 return of(item);
             })
         );
+        // this.getProductBySku(id)
     }
-    
+
+    getProductBySku(sku: string) {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}`,
+        });
+        let params = new HttpParams().set('sku', sku);
+
+        return this._httpClient.get<any>(this.apiUrl + '/product', {
+            headers: headers,
+            params,
+        });
+    }
 }

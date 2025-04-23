@@ -1,14 +1,14 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '@env/environment';
-import HttpsProxyAgent from 'https-proxy-agent';
 
-
-const proxyConfig = [{
-    context: '/api',
-    target: 'https://api-demo.airwallex.com',
-    secure: false
-  }];
+const proxyConfig = [
+    {
+        context: '/api',
+        target: 'https://api-demo.airwallex.com',
+        secure: false,
+    },
+];
 
 @Injectable({ providedIn: 'root' })
 export class AirwallexService {
@@ -32,8 +32,28 @@ export class AirwallexService {
         });
         // console.log(headers);
         // const body = null;
-        return this._httpClient.get(
-            this.apiUrl + '/airwallex', {
+        return this._httpClient.get(this.apiUrl + '/airwallex', {
+            headers: headers,
+        });
+    }
+
+    makeSubscription(customerId: string, consentId: string, plan: string, sku? : string, name?: string) {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}`,
+        });
+        // console.log(headers);
+        const body = {
+            customerId,
+            consentId,
+            plan,
+            sku,
+            name,
+        };
+        return this._httpClient.post(
+            this.apiUrl + '/airwallex/subscription',
+            body,
+            {
                 headers: headers,
             }
         );

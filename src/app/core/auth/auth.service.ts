@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { environment } from '@env/environment';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
-import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
+import { Observable, of, switchMap, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -77,36 +77,38 @@ export class AuthService {
             return throwError('User is already logged in.');
         }
 
-        return this._httpClient.post(this.authenUrl + '/signin', credentials).pipe(
-            switchMap((response: any) => {
-                console.log(response);
-                const auth = response.data[0];
-                // Store the access token in the local storage
-                this.accessToken = auth.jwt;
+        return this._httpClient
+            .post(this.authenUrl + '/signin', credentials)
+            .pipe(
+                switchMap((response: any) => {
+                    console.log(response);
+                    const auth = response.data[0];
+                    // Store the access token in the local storage
+                    this.accessToken = auth.jwt;
 
-                // Set the authenticated flag to true
-                this._authenticated = true;
+                    // Set the authenticated flag to true
+                    this._authenticated = true;
 
-                // Store the user on the user service
-                this._userService.user = {
-                    id: auth.userId,
-                    name: auth.userName,
-                    email: auth.email,
-                    avatar: 'images/avatars/brian-hughes.jpg',
-                    status: 'online',
-                };
-                this.user = JSON.stringify({
-                    id: auth.userId,
-                    name: auth.userName,
-                    email: auth.email,
-                    avatar: 'images/avatars/brian-hughes.jpg',
-                    status: 'online',
+                    // Store the user on the user service
+                    this._userService.user = {
+                        id: auth.userId,
+                        name: auth.userName,
+                        email: auth.email,
+                        avatar: 'images/avatars/brian-hughes.jpg',
+                        status: 'online',
+                    };
+                    this.user = JSON.stringify({
+                        id: auth.userId,
+                        name: auth.userName,
+                        email: auth.email,
+                        avatar: 'images/avatars/brian-hughes.jpg',
+                        status: 'online',
+                    });
+
+                    // Return a new observable with the response
+                    return of(response);
                 })
-
-                // Return a new observable with the response
-                return of(response);
-            })
-        );
+            );
     }
 
     /**
@@ -115,10 +117,10 @@ export class AuthService {
     signInUsingToken(): Observable<any> {
         let d = new Date();
         let now = d.getMilliseconds();
-        if ((Number(this.tokenExpire) < now)) {
+        if (Number(this.tokenExpire) < now) {
             this._userService.user = JSON.parse(this.user);
             return of(true);
-        }else {
+        } else {
             return of(false);
         }
         // Sign in using the token
@@ -153,7 +155,6 @@ export class AuthService {
         //             return of(true);
         //         })
         //     );
-
     }
 
     /**
@@ -181,7 +182,8 @@ export class AuthService {
         password: string;
         company: string;
     }): Observable<any> {
-        return this._httpClient.post('api/auth/sign-up', user);
+        return this._httpClient.post(this.authenUrl + '/signup', user);
+        // return this._httpClient.post('api/auth/sign-up', user);
     }
 
     /**
@@ -217,5 +219,84 @@ export class AuthService {
 
         // If the access token exists, and it didn't expire, sign in using it
         return this.signInUsingToken();
+    }
+    /**
+     * Sign in using the social
+     */
+    loginSocial() {}
+
+    getGoogleUrl() {
+        return this._httpClient.get(this.authenUrl + '/google').pipe(
+            switchMap((response: any) => {
+                console.log(response);
+                const url = response.data[0];
+                return of(url);
+            })
+        );
+    }
+
+    callBackGoogleUrl(code: string) {
+        let params = new HttpParams().set('code', code);
+        return this._httpClient
+            .get(this.authenUrl + '/social/callback', {
+                params,
+            })
+            .pipe(
+                switchMap((response: any) => {
+                    console.log(response);
+                    const auth = response.data[0];
+                    // Store the access token in the local storage
+                    this.accessToken = auth.jwt;
+
+                    // Set the authenticated flag to true
+                    this._authenticated = true;
+
+                    // Store the user on the user service
+                    this._userService.user = {
+                        id: auth.userId,
+                        name: auth.userName,
+                        email: auth.email,
+                        avatar: 'images/avatars/brian-hughes.jpg',
+                        status: 'online',
+                    };
+                    this.user = JSON.stringify({
+                        id: auth.userId,
+                        name: auth.userName,
+                        email: auth.email,
+                        avatar: 'images/avatars/brian-hughes.jpg',
+                        status: 'online',
+                    });
+
+                    // Return a new observable with the response
+                    return of(response);
+                })
+            );
+        // return of('acv');
+    }
+
+    verify(token: string) {
+        let params = new HttpParams().set('token', token);
+        return this._httpClient
+            .get(this.authenUrl + '/verify', {
+                params,
+            })
+            .pipe(
+                switchMap((response: any) => {
+                    // Return a new observable with the response
+                    return of(response);
+                })
+            );
+    }
+
+    reVerify(email: string) {
+        const body = {
+            email,
+        };
+        return this._httpClient.post(this.authenUrl + '/verify', body).pipe(
+            switchMap((response: any) => {
+                // Return a new observable with the response
+                return of(response);
+            })
+        );
     }
 }

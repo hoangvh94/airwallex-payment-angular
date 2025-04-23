@@ -105,6 +105,8 @@ export class FuseLoadingService {
      * @param url
      */
     _setLoadingStatus(status: boolean, url: string): void {
+        console.log(url);
+        
         // Return if the url was not provided
         if (!url) {
             console.error('The request URL must be provided!');

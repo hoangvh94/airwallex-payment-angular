@@ -15,13 +15,22 @@ import { appRoutes } from 'app/app.routes';
 import { provideAuth } from 'app/core/auth/auth.provider';
 import { provideIcons } from 'app/core/icons/icons.provider';
 import { mockApiServices } from 'app/mock-api';
+import { MARKED_OPTIONS, provideMarkdown } from 'ngx-markdown';
+import { provideNgxStripe } from 'ngx-stripe';
 import { firstValueFrom } from 'rxjs';
 import { TranslocoHttpLoader } from './core/transloco/transloco.http-loader';
-import { provideNgxStripe } from 'ngx-stripe';
 
 export const appConfig: ApplicationConfig = {
     providers: [
-        provideNgxStripe('pk_test_51MziZKDnfhTxQmx98ded7vhy40ATWeQVFNL7F7nVFIlbsbBL4mLOaSyVxKSOTBmcnMJWVo6CnxLTZQxr1pxWcMSj00tgxXYVjU'),
+        provideMarkdown({
+            markedOptions: {
+                provide: MARKED_OPTIONS,
+                useFactory: markedOptionsFactory,
+            },
+        }),
+        provideNgxStripe(
+            'pk_test_51MziZKDnfhTxQmx98ded7vhy40ATWeQVFNL7F7nVFIlbsbBL4mLOaSyVxKSOTBmcnMJWVo6CnxLTZQxr1pxWcMSj00tgxXYVjU'
+        ),
         provideAnimations(),
         provideHttpClient(),
         provideRouter(
@@ -131,3 +140,13 @@ export const appConfig: ApplicationConfig = {
         }),
     ],
 };
+
+export function markedOptionsFactory() {
+    return {
+        breaks: true,
+        headerIds: true,
+        mangle: false,
+        smartLists: true,
+        smartypants: false,
+    };
+}

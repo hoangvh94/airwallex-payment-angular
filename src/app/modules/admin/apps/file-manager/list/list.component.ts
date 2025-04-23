@@ -1,3 +1,4 @@
+import { HttpStatusCode } from '@angular/common/http';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -7,8 +8,16 @@ import {
     ViewChild,
     ViewEncapsulation,
 } from '@angular/core';
+import {
+    FormsModule,
+    ReactiveFormsModule,
+    UntypedFormControl,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {
@@ -20,12 +29,13 @@ import {
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { AiService } from 'app/core/ai/ai.service';
 import { FileType, PDF } from 'app/core/ai/file.types';
+import { Product } from 'app/core/server/product.types';
+import { ServerService } from 'app/core/server/server.service';
+import { UserService } from 'app/core/user/user.service';
+import { User } from 'app/core/user/user.types';
 import { FileManagerService } from 'app/modules/admin/apps/file-manager/file-manager.service';
-import {
-    Item,
-    Items,
-} from 'app/modules/admin/apps/file-manager/file-manager.types';
-import { Subject, takeUntil } from 'rxjs';
+import { Item } from 'app/modules/admin/apps/file-manager/file-manager.types';
+import { Subject, debounceTime, filter, map, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'file-manager-list',
@@ -40,18 +50,27 @@ import { Subject, takeUntil } from 'rxjs';
         MatButtonModule,
         MatIconModule,
         MatTooltipModule,
+        MatRadioModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
     ],
 })
 export class FileManagerListComponent implements OnInit, OnDestroy {
     @ViewChild('matDrawer', { static: true }) matDrawer: MatDrawer;
     drawerMode: 'side' | 'over';
     selectedItem: Item;
-    items: Items;
+    items: Item[];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    searchControl: UntypedFormControl = new UntypedFormControl();
 
     currentFile?: File;
     fileName: string = 'Select File';
-
+    user: User;
+    content = FileType.CONTENT;
+    catalog = FileType.CATALOG;
+    fileType = FileType.CONTENT;
     /**
      * Constructor
      */
@@ -61,7 +80,9 @@ export class FileManagerListComponent implements OnInit, OnDestroy {
         private _router: Router,
         private _fileManagerService: FileManagerService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _aiService: AiService
+        private _aiService: AiService,
+        private serverService: ServerService,
+        private _userService: UserService
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -72,28 +93,14 @@ export class FileManagerListComponent implements OnInit, OnDestroy {
      * On init
      */
     ngOnInit(): void {
-        this.getAllFile();
-
-        // Get the items
-        this._fileManagerService.items$
+        // Subscribe to the user service
+        this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((items: Items) => {
-                this.items = items;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
+            .subscribe((user: User) => {
+                this.user = user;
+                
             });
-
-        // Get the item
-        this._fileManagerService.item$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((item: Item) => {
-                this.selectedItem = item;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
+        
         // Subscribe to media query change
         this._fuseMediaWatcherService
             .onMediaQueryChange$('(min-width: 1440px)')
@@ -105,6 +112,9 @@ export class FileManagerListComponent implements OnInit, OnDestroy {
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        // this.findProduct();
+        this.getAllFile();
     }
 
     /**
@@ -114,6 +124,10 @@ export class FileManagerListComponent implements OnInit, OnDestroy {
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
+    }
+
+    aiUSerId() {
+        return this.user.name + this.user.id;
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -143,77 +157,133 @@ export class FileManagerListComponent implements OnInit, OnDestroy {
 
     selectFile(event: any): void {
         if (event.target.files && event.target.files[0]) {
-          const file: File = event.target.files[0];
-          this.currentFile = file;
-          this.fileName = this.currentFile.name;
+            const file: File = event.target.files[0];
+            this.currentFile = file;
+            this.fileName = this.currentFile.name;
         } else {
-          this.fileName = 'Select File';
+            this.fileName = 'Select File';
         }
-        // this.progress = 0;
-        // this.message = '';
-      }
+    }
 
     getAllFile() {
-        const pdf: PDF = {
-            user_id: 'E1',
-            product: 'Komatsu WA320-5 SN 60001-UP (KomatsuTRAX(GPRS)) Parts manual Wheel Loader',
-            file: this.currentFile,
-            type: FileType.CONTENT
-        }
-        this._aiService.getAllFile().subscribe(
+        // this._aiService.getAllFile(this.aiUSerId()).subscribe(
+        //     (next) => {
+        //         console.log(next);
+        //         this.items = next.data;
+        //         this._changeDetectorRef.markForCheck();
+        //     },
+        //     (error) => {
+        //         console.log(error);
+        //     }
+        // );
+        this.serverService.getProduct().subscribe(
             (next) => {
                 console.log(next);
+                this.items = next.data;
+                this._changeDetectorRef.markForCheck();
             },
             (error) => {
                 console.log(error);
-                // // Re-enable the form
-                // this.signInForm.enable();
-
-                // // Reset the form
-                // this.signInNgForm.resetForm();
-
-                // // Set the alert
-                // this.alert = {
-                //     type: 'error',
-                //     message: 'Wrong email or password',
-                // };
-
-                // // Show the alert
-                // this.showAlert = true;
             }
         );
     }
-    
+
+    addProduct() {
+            const product: Product = {
+                sku: this.searchControl.value,
+                name: this.searchControl.value + '- add by hand',
+            };
+            this.serverService.addProductAdm(product).subscribe({
+                next: (response) => {
+                    console.log(response);
+                    switch (response['status']) {
+                        case HttpStatusCode.Ok: {
+                            console.log(response['data'][0]);
+                            
+                            this.uploadFile()
+                            break;
+                        }
+                        
+                    }
+                    this.getAllFile();
+                }, // nextHandler
+                error: (error) => {
+                    console.log(error);
+                },
+            });
+        }
 
     uploadFile() {
         const pdf: PDF = {
-            user_id: 'E2',
+            user_id: this.aiUSerId(),
             product: this.fileName.slice(0, -4),
             file: this.currentFile,
-            type: FileType.CATALOG
-        }
-        console.log(pdf);
+            type: this.fileType
+        };
         this._aiService.uploadFile(pdf).subscribe(
             (next) => {
                 console.log(next);
             },
             (error) => {
                 console.log(error);
-                // // Re-enable the form
-                // this.signInForm.enable();
-
-                // // Reset the form
-                // this.signInNgForm.resetForm();
-
-                // // Set the alert
-                // this.alert = {
-                //     type: 'error',
-                //     message: 'Wrong email or password',
-                // };
-
-                // // Show the alert
-                // this.showAlert = true;
             }
         );
+        console.log(pdf);
     }
+
+    // findProduct() {
+    //     this.searchControl.valueChanges
+    //         .pipe(
+    //             debounceTime(300),
+    //             takeUntil(this._unsubscribeAll),
+    //             map((value) => {
+    //                 // Continue
+    //                 return value;
+    //             }),
+    //             // Filter out undefined/null/false statements and also
+    //             // filter out the values that are smaller than minLength
+    //             filter((value) => value && value.length >= 2)
+    //         )
+    //         .subscribe((value) => {
+    //             // this._httpClient
+    //             //     .post('api/common/search', { query: value })
+    //             //     .subscribe((resultSets: any) => {
+    //             //         // Store the result sets
+    //             //         this.resultSets = resultSets;
+    //             //         console.log(resultSets);
+
+    //             //         // Execute the event
+    //             //         this.search.next(resultSets);
+    //             //     });
+    //             // this.fuseLoadingService._setLoadingStatus(
+    //             //     true,
+    //             //     'search alogla'
+    //             // );
+
+    //             this.serverService
+    //                 .getProductBySku(value)
+    //                 // .pipe(
+    //                 //     finalize(() => {
+    //                 //         // Set the status to false if there are any errors or the request is completed
+    //                 //         this.fuseLoadingService._setLoadingStatus(
+    //                 //             false,
+    //                 //             'search alogla'
+    //                 //         );
+    //                 //     })
+    //                 // )
+    //                 .subscribe({
+    //                     next: (response) => {
+    //                         console.log(response);
+    //                         if (response.status === HttpStatusCode.Ok) {
+    //                             console.log('no need add file for this one');
+    //                         } else {
+    //                             console.log('add di');
+    //                         }
+    //                     },
+    //                     error: (error) => {
+    //                         console.log(error);
+    //                     },
+    //                 });
+    //         });
+    // }
 }

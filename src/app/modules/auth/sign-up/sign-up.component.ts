@@ -1,3 +1,4 @@
+import { HttpStatusCode } from '@angular/common/http';
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import {
     FormsModule,
@@ -97,24 +98,33 @@ export class AuthSignUpComponent implements OnInit {
         this._authService.signUp(this.signUpForm.value).subscribe(
             (response) => {
                 // Navigate to the confirmation required page
-                this._router.navigateByUrl('/confirmation-required');
+
+                if (response.status === HttpStatusCode.Ok) {
+                    this._router.navigateByUrl('/confirmation-required');
+                } else {
+                    this.alertSignupFail(response.message);
+                }
             },
             (response) => {
-                // Re-enable the form
-                this.signUpForm.enable();
-
-                // Reset the form
-                this.signUpNgForm.resetForm();
-
-                // Set the alert
-                this.alert = {
-                    type: 'error',
-                    message: 'Something went wrong, please try again.',
-                };
-
-                // Show the alert
-                this.showAlert = true;
+                this.alertSignupFail();
             }
         );
+    }
+
+    alertSignupFail(message: string = 'Something went wrong, please try again.') {
+        // Re-enable the form
+        this.signUpForm.enable();
+
+        // Reset the form
+        this.signUpNgForm.resetForm();
+
+        // Set the alert
+        this.alert = {
+            type: 'error',
+            message
+        };
+
+        // Show the alert
+        this.showAlert = true;
     }
 }

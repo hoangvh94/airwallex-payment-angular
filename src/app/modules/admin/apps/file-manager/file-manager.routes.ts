@@ -12,20 +12,19 @@ import { FileManagerListComponent } from 'app/modules/admin/apps/file-manager/li
 import { catchError, throwError } from 'rxjs';
 
 /**
- * Folder resolver
+ * Item resolver
  *
  * @param route
  * @param state
  */
-const folderResolver = (
+const itemResolver = (
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
 ) => {
     const fileManagerService = inject(FileManagerService);
     const router = inject(Router);
-
-    return fileManagerService.getItems(route.paramMap.get('folderId')).pipe(
-        // Error here means the requested folder is not available
+    return fileManagerService.getItemById(route.paramMap.get('id')).pipe(
+        // Error here means the requested item is not available
         catchError((error) => {
             // Log the error
             console.error(error);
@@ -43,20 +42,20 @@ const folderResolver = (
 };
 
 /**
- * Item resolver
+ * Folder resolver
  *
  * @param route
  * @param state
  */
-const itemResolver = (
+const folderResolver = (
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
 ) => {
     const fileManagerService = inject(FileManagerService);
     const router = inject(Router);
 
-    return fileManagerService.getItemById(route.paramMap.get('id')).pipe(
-        // Error here means the requested item is not available
+    return fileManagerService.getItems(route.paramMap.get('folderId')).pipe(
+        // Error here means the requested folder is not available
         catchError((error) => {
             // Log the error
             console.error(error);
@@ -116,29 +115,26 @@ export default [
         path: '',
         component: FileManagerComponent,
         children: [
-            {
-                path: 'folders/:folderId',
-                component: FileManagerListComponent,
-                resolve: {
-                    item: folderResolver,
-                },
-                children: [
-                    {
-                        path: 'details/:id',
-                        component: FileManagerDetailsComponent,
-                        resolve: {
-                            item: itemResolver,
-                        },
-                        canDeactivate: [canDeactivateFileManagerDetails],
-                    },
-                ],
-            },
+            // {
+            //     path: 'folders/:folderId',
+            //     component: FileManagerListComponent,
+            //     children: [
+            //         {
+            //             path: 'details/:id',
+            //             component: FileManagerDetailsComponent,
+            //             resolve: {
+            //                 item: itemResolver,
+            //             },
+            //             canDeactivate: [canDeactivateFileManagerDetails],
+            //         },
+            //     ],
+            // },
             {
                 path: '',
                 component: FileManagerListComponent,
-                resolve: {
-                    items: () => inject(FileManagerService).getItems(),
-                },
+                // resolve: {
+                //     items: () => inject(FileManagerService).getItems(),
+                // },
                 children: [
                     {
                         path: 'details/:id',
