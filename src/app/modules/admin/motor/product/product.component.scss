@@ -8,20 +8,14 @@ body,
 .chat-box,
 .reference {
     overflow-y: auto; /* Enable scroll for chat box when content overflows */
-    padding: 10px;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 278px); /* Adjust the height dynamically */
+    max-height: calc(100vh - 200px); /* Adjust the height dynamically */
     &.is-mobile {
         max-height: calc(100vh - 90px);
     }
 }
 
-.message {
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 10px;
-}
 
 .message.user {
     background-color: #e0f7fa;
@@ -57,5 +51,44 @@ form {
 @media screen and (max-width: 640px) {
     #custom-tooltip {
         display: none !important;
+    }
+}
+
+//table
+::ng-deep markdown table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #d1d5db; /* gray-300 equivalent */
+}
+
+::ng-deep markdown th,
+::ng-deep markdown td {
+    border: 1px solid #d1d5db; /* adds border to all cells */
+    padding: 8px 12px;
+    text-align: left;
+    padding-inline-start: 0.5714286em !important;
+}
+
+::ng-deep markdown thead {
+    background-color: #f3f4f6; /* gray-100 */
+}
+
+::ng-deep markdown tr:nth-child(even) {
+    background-color: #f9fafb; /* gray-50 */
+}
+
+::ng-deep markdown tr:nth-child(even) {
+    background-color: #f9fafb; /* gray-50 */
+}
+
+::ng-deep markdown p {
+    margin-top: 0 !important;
+    margin-bottom: 12px !important;
+}
+
+::ng-deep .reference {
+    li {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
     }
 }

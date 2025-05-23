@@ -99,6 +99,7 @@ const config = {
             },
             colors: {
                 gray: colors.slate,
+                textDefault: '#131D31',
             },
             flex: {
                 0: '0 0 auto',

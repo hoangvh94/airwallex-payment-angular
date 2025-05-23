@@ -131,4 +131,113 @@ export class MotorAiService {
             model_id: modelId,
         });
     }
+
+    streamChatbotResponse2(payload: any): Observable<string> {
+        return new Observable((observer) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', this.apiUrl + '/chatbot', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            let receivedText = '';
+
+            xhr.onreadystatechange = () => {
+                if (
+                    xhr.readyState === XMLHttpRequest.LOADING ||
+                    xhr.readyState === XMLHttpRequest.DONE
+                ) {
+                    const newText = xhr.responseText.substring(
+                        receivedText.length
+                    );
+                    receivedText = xhr.responseText;
+
+                    if (newText) {
+                        observer.next(newText);
+                    }
+                }
+
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status !== 200) {
+                        observer.error(
+                            `Error: ${xhr.status} - ${xhr.statusText}`
+                        );
+                    } else {
+                        observer.complete();
+                    }
+                }
+            };
+
+            xhr.onerror = () => {
+                observer.error('Network error');
+            };
+
+            xhr.timeout = 300000; // 5 minutes
+            xhr.send(JSON.stringify(payload));
+        });
+    }
+
+    streamChatbotResponse3(payload: any) {
+        return new Observable<string>((observer) => {
+            // Using fetch API for streaming responses
+            fetch(this.apiUrl + '/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        observer.error(
+                            `Stream text in UI Error: ${response.statusText}`
+                        );
+                        return;
+                    }
+
+                    // Get the reader from the response body stream
+                    const reader = response.body?.getReader();
+                    if (!reader) {
+                        observer.error('Could not get reader from response');
+                        return;
+                    }
+
+                    // Function to process the stream chunks
+                    const processText = async () => {
+                        try {
+                            const decoder = new TextDecoder();
+
+                            while (true) {
+                                const { done, value } = await reader.read();
+
+                                if (done) {
+                                    observer.complete();
+                                    break;
+                                }
+
+                                // Decode the chunk and emit it
+                                const chunk = decoder.decode(value, {
+                                    stream: true,
+                                });
+                                observer.next(chunk);
+                            }
+                        } catch (error) {
+                            observer.error(
+                                `Error in stream processing: ${error}`
+                            );
+                        }
+                    };
+
+                    processText();
+                })
+                .catch((error) => {
+                    observer.error(`Error in call_chatbot_api: ${error}`);
+                    observer.complete();
+                });
+        });
+    }
+
+    refreshLink(url: string) {
+        return this._httpClient.post(this.apiUrl + '/refresh-link', {
+            link: url,
+        });
+    }
 }

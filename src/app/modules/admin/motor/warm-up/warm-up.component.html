@@ -1,0 +1,72 @@
+<div class="w-full">
+    <div class="mx-auto max-w-[792px]">
+        <!-- Title -->
+        <h2
+            class="my-[24px] text-center text-[24px] font-semibold leading-[32px]"
+        >
+            How Can I help you on this {{ makeName }}
+        </h2>
+
+        <!-- Input with Paper Airplane Icon -->
+        <div class="relative mb-[24px]">
+            <form
+                [formGroup]="chatForm"
+                (ngSubmit)="sendMessage()"
+                class="mt-auto flex"
+            >
+                <input
+                    formControlName="message"
+                    type="text"
+                    placeholder="I got a problem..."
+                    class="h-[60px] w-full rounded-[8px] border border-[#D0D5DE] bg-white px-[16px] pr-[48px] text-[16px] leading-[24px]"
+                />
+                <!-- Paper Airplane Icon -->
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pointer-events-none absolute right-[16px] top-1/2 h-[24px] w-[24px] -translate-y-1/2 text-[#136EFB]"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M2.94 2.94a.75.75 0 0 1 .77-.18l13.5 5.25a.75.75 0 0 1 0 1.38l-13.5 5.25a.75.75 0 0 1-1.02-.84l1.08-4.32-1.08-4.32a.75.75 0 0 1 .25-.82zM4.18 8.25l.69 2.76a.75.75 0 0 1 0 .48l-.69 2.76 9.82-3.82L4.18 8.25z"
+                        clip-rule="evenodd"
+                    />
+                </svg>
+            </form>
+        </div>
+
+        <!-- Sub Text -->
+        <div
+            class="mb-[12px] text-[14px] uppercase leading-[20px] text-[#6E7384]"
+        >
+            For this Model and Engine
+        </div>
+
+        <!-- 6 Boxes Grid -->
+        <div class="flex justify-between">
+            <button
+                (click)="openDialog(item)"
+                class="flex h-[122px] w-[122px] flex-col justify-between rounded-[6px] border border-[#D0D5DE] bg-white px-[12px] py-[16px]"
+                *ngFor="let item of issues"
+            >
+                <div
+                    class="mb-[8px] text-left text-[14px] leading-[20px] tracking-[-0.015em] text-[#505665]"
+                >
+                    {{ item.text }}
+                </div>
+                <!-- Wrench Screwdriver Icon -->
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-[24px] w-[24px] text-[#136EFB]"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                >
+                    <path
+                        d="M14.7 2.29a1 1 0 0 0-1.42 0l-.88.88 1.42 1.42.88-.88a1 1 0 0 0 0-1.42zM11.64 5.35 9.8 3.5l-7.07 7.07a1 1 0 0 0-.22.33l-1.5 3.5a1 1 0 0 0 1.3 1.3l3.5-1.5a1 1 0 0 0 .33-.22l7.07-7.07-1.84-1.84zm4.07 3.54-1.07 1.07a5 5 0 0 1-1.53 5.08 5 5 0 0 1-5.08 1.53l1.07-1.07a3 3 0 0 0 4.24-4.24l1.07-1.07a1 1 0 0 1 1.42 1.42z"
+                    />
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>

@@ -4,7 +4,9 @@ export function getSpecifications(items: any[]) {
 
     items.forEach((item) => {
         let block = '<div>';
-
+        if (item.Data) {
+            block += `<div>${item.Data}</div>`;
+        }
         if (item.Value) {
             block += `<div>Value: ${item.Value} ${item.UnitOfMeasure}</div>`;
         }

@@ -1,79 +1,12 @@
-<div class="flex flex-col md:flex-row gap-6 p-6 w-full">
-  <!-- Form 1: Check by VIN -->
-  <div class="w-full md:w-1/2">
-    <h3 class="text-xl font-semibold mb-4">Check By VIN</h3>
-    <form [formGroup]="vinForm" (ngSubmit)="onVinSubmit()" class="space-y-4">
-      <input type="text" formControlName="vin" placeholder="Enter VIN"
-        class="w-full px-4 py-2 border border-gray-300 rounded-md" />
-      <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
-        Submit
-      </button>
-    </form>
-  </div>
+<div class="w-full bg-[#E9EBEF] flex flex-col items-center justify-center min-h-screen p-4">
+  <h1 class="text-[40px] leading-[46px] font-semibold mb-[24px]">
+    Wellcome to <span class="text-[#136EFB]">Jayda AI</span>
+  </h1>
+  <button class="bg-[#136EFB] text-white px-6 h-[60px] rounded-[10px] shadow-md hover:bg-blue-700 transition"
+    (click)="openVehiclePopup()">
+    New Vehicle
+  </button>
 
-  <!-- Divider -->
-  <div class="hidden md:block w-px bg-gray-300 mx-2"></div>
-
-  <!-- Form 2: Deeply Check -->
-  <div class="w-full md:w-1/2">
-    <h3 class="text-xl font-semibold mb-4">Deeply Check by Models</h3>
-    <form [formGroup]="deepCheckForm" (ngSubmit)="onDeepCheckSubmit()" class="space-y-4">
-      <ng-container>
-        <select formControlName="year" class="w-full px-4 py-2 border border-gray-300 rounded-md">
-          <option value="">Select Year</option>
-          <option *ngFor="let y of years">{{ y }}</option>
-
-        </select>
-        <div *ngIf="deepCheckForm.get('year')?.touched && deepCheckForm.get('year')?.invalid"
-          class="text-red-500 text-sm">
-          Year is required.
-        </div>
-      </ng-container>
-
-      <ng-container *ngIf="makes.length > 0">
-        <select formControlName="make" class="w-full px-4 py-2 border border-gray-300 rounded-md">
-          <option value="">Select Make</option>
-          <option *ngFor="let m of makes" value="{{m.MakeID}}">{{ m.MakeName }}</option>
-        </select>
-        <div *ngIf="deepCheckForm.get('make')?.touched && deepCheckForm.get('make')?.invalid"
-          class="text-red-500 text-sm">
-          Make is required.
-        </div>
-      </ng-container>
-
-      <ng-container *ngIf="models.length > 0">
-        <select formControlName="model" class="w-full px-4 py-2 border border-gray-300 rounded-md">
-          <option value="">Select Model</option>
-          <option *ngFor="let m of models" value="{{m.ModelID}}">{{ m.ModelName }}</option>
-        </select>
-        <div *ngIf="deepCheckForm.get('model')?.touched && deepCheckForm.get('model')?.invalid"
-          class="text-red-500 text-sm">
-          Model is required.
-        </div>
-      </ng-container>
-      <ng-container *ngIf="submodels.length > 0">
-        <select formControlName="submodel" class="w-full px-4 py-2 border border-gray-300 rounded-md">
-          <option value="">Select Submodel</option>
-          <option *ngFor="let s of submodels" value="{{s.SubModelID}}">{{ s.SubModelName }}</option>
-        </select>
-        <div *ngIf="deepCheckForm.get('submodel')?.touched && deepCheckForm.get('submodel')?.invalid"
-          class="text-red-500 text-sm">
-          submodel is required.
-        </div>
-      </ng-container>
-      <ng-container *ngIf="engines.length > 0">
-        <select formControlName="engine" class="w-full px-4 py-2 border border-gray-300 rounded-md">
-          <option value="">Select Engine</option>
-          <option *ngFor="let e of engines" value="{{e.EngineID}}">{{ e.Description }}</option>
-        </select>
-        <div *ngIf="deepCheckForm.get('engine')?.touched && deepCheckForm.get('engine')?.invalid"
-          class="text-red-500 text-sm">
-          engine is required.
-        </div>
-      </ng-container>
-      <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700">
-        Submit
-      </button>
-    </form>
-  </div>
+  <!-- Vehicle Popup -->
+  <app-vehicle *ngIf="showVehiclePopup" (close)="closeVehiclePopup()"></app-vehicle>
 </div>

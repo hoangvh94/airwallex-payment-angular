@@ -1,0 +1,170 @@
+<div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30"
+>
+    <div class="w-[400px] rounded-lg bg-white p-6">
+        <!-- Title -->
+        <h2 class="mb-[24px] text-[24px] font-semibold leading-[32px]">
+            Add new vehicle
+        </h2>
+
+        <!-- Radio group -->
+        <div class="mb-6 flex items-center gap-4">
+            <label class="flex w-50 cursor-pointer items-center gap-2">
+                <input
+                    type="radio"
+                    name="vehicleType"
+                    value="vin"
+                    [(ngModel)]="selectedOption"
+                    class="h-[20px] w-[20px] accent-[#136EFB]"
+                />
+                VIN Number
+            </label>
+
+            <label class="flex w-50 cursor-pointer items-center gap-2">
+                <input
+                    type="radio"
+                    name="vehicleType"
+                    value="make"
+                    [(ngModel)]="selectedOption"
+                    class="h-[20px] w-[20px] accent-[#136EFB]"
+                />
+                Make / Model
+            </label>
+        </div>
+
+        <!-- VIN Input -->
+        <div *ngIf="selectedOption === 'vin'" [formGroup]="vinForm" class="mb-[32px]">
+                <label
+                    class="mb-1 block text-[16px] font-medium leading-[24px]"
+                >
+                    VIN Number
+                    <span class="ml-2 text-[14px] leading-[20px] text-red-500"
+                        >*</span
+                    >
+                </label>
+                <input
+                    type="text"
+                    formControlName="vin"
+                    placeholder="Enter VIN number"
+                    class="h-[48px] w-full rounded-[8px] border border-[#D0D5DE] px-[12px] py-[12px]"
+                />
+        </div>
+
+        <!-- Deep Check Form -->
+        <div *ngIf="selectedOption === 'make'" [formGroup]="deepCheckForm" class="mb-[32px]">
+            <!-- Year -->
+            <div class="mb-[16px]">
+                <label
+                    class="mb-1 block text-[16px] font-medium leading-[24px]"
+                >
+                    Year
+                    <span class="ml-2 text-[14px] leading-[20px] text-red-500"
+                        >*</span
+                    >
+                </label>
+                <select
+                    formControlName="year"
+                    class="h-[48px] w-full rounded-[8px] border border-[#D0D5DE] px-[12px] py-[12px]"
+                >
+                    <option value="" disabled selected>Select Year</option>
+                    <option *ngFor="let y of years">{{ y }}</option>
+                </select>
+            </div>
+
+            <!-- Make -->
+            <div class="mb-[16px]" *ngIf="makes.length > 0">
+                <label
+                    class="mb-1 block text-[16px] font-medium leading-[24px]"
+                >
+                    Make
+                    <span class="ml-2 text-[14px] leading-[20px] text-red-500"
+                        >*</span
+                    >
+                </label>
+                <select
+                    formControlName="make"
+                    class="h-[48px] w-full rounded-[8px] border border-[#D0D5DE] px-[12px] py-[12px]"
+                >
+                    <option value="" disabled selected>Make</option>
+                    <option *ngFor="let m of makes" value="{{ m.MakeID }}">
+                        {{ m.MakeName }}
+                    </option>
+                </select>
+            </div>
+
+            <!-- Model -->
+            <div class="mb-[16px]" *ngIf="models.length > 0">
+                <label
+                    class="mb-1 block text-[16px] font-medium leading-[24px]"
+                >
+                    Model
+                    <span class="ml-2 text-[14px] leading-[20px] text-red-500"
+                        >*</span
+                    >
+                </label>
+                <select
+                    formControlName="model"
+                    class="h-[48px] w-full rounded-[8px] border border-[#D0D5DE] px-[12px] py-[12px]"
+                >
+                    <option value="" disabled selected>Model</option>
+                    <option *ngFor="let m of models" value="{{ m.ModelID }}">
+                        {{ m.ModelName }}
+                    </option>
+                </select>
+            </div>
+
+            <!-- Submodel -->
+            <div class="mb-[16px]" *ngIf="submodels.length > 0">
+                <label
+                    class="mb-1 block text-[16px] font-medium leading-[24px]"
+                >
+                    Submodel
+                    <span class="ml-2 text-[14px] leading-[20px] text-red-500"
+                        >*</span
+                    >
+                </label>
+                <select
+                    formControlName="submodel"
+                    class="h-[48px] w-full rounded-[8px] border border-[#D0D5DE] px-[12px] py-[12px]"
+                >
+                    <option value="" disabled selected>Submodel</option>
+                    <option
+                        *ngFor="let s of submodels"
+                        value="{{ s.SubModelID }}"
+                    >
+                        {{ s.SubModelName }}
+                    </option>
+                </select>
+            </div>
+
+            <!-- Engine -->
+            <div class="mb-[16px]" *ngIf="engines.length > 0">
+                <label
+                    class="mb-1 block text-[16px] font-medium leading-[24px]"
+                >
+                    Engine
+                    <span class="ml-2 text-[14px] leading-[20px] text-red-500"
+                        >*</span
+                    >
+                </label>
+                <select
+                    formControlName="engine"
+                    class="h-[48px] w-full rounded-[8px] border border-[#D0D5DE] px-[12px] py-[12px]"
+                >
+                    <option value="" disabled selected>Engine</option>
+                    <option *ngFor="let e of engines" value="{{ e.EngineID }}">
+                        {{ e.Description }}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Add Vehicle Button -->
+        <button
+            class="h-[60px] w-full rounded-[10px] bg-[#136EFB] text-white shadow transition hover:bg-blue-700"
+            (click)="addVehicle()"
+        >
+            Add Vehicle
+        </button>
+    </div>
+</div>
